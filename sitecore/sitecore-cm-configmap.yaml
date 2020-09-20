@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sitecore-cm-configmap
+data:
+  Sitecore_AppSettings_instanceNameMode__define: default
+  Sitecore_ConnectionStrings_Core: Data Source=mssql;Initial Catalog=Sitecore.Core;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Security: Data Source=mssql;Initial Catalog=Sitecore.Core;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Master: Data Source=mssql;Initial Catalog=Sitecore.Master;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Web: Data Source=mssql;Initial Catalog=Sitecore.Web;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Reporting.ApiKey: voo60v951fcvch933bwxabghoo1son25
+  Sitecore_ConnectionStrings_Messaging: Data Source=mssql;Initial Catalog=Sitecore.Messaging;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Xdb.Referencedata: Data Source=mssql;Initial Catalog=Sitecore.Referencedata;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_ExperienceForms: Data Source=mssql;Initial Catalog=Sitecore.ExperienceForms;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Exm.Master: Data Source=mssql;Initial Catalog=Sitecore.Exm.master;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Reporting: Data Source=mssql;Initial Catalog=Sitecore.Reporting;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Sitecore.Reporting.Client: http://cortexreporting
+  Sitecore_ConnectionStrings_Solr.Search: http://solr:8983/solr
+  Sitecore_ConnectionStrings_XConnect.Collection: http://xdbcollection
+  Sitecore_ConnectionStrings_XConnect.Search: http://xdbsearch
+  Sitecore_ConnectionStrings_Xdb.MarketingAutomation.Operations.Client: http://xdbautomation
+  Sitecore_ConnectionStrings_Xdb.MarketingAutomation.Reporting.Client: http://xdbautomationrpt
+  Sitecore_ConnectionStrings_Xdb.ReferenceData.Client: http://xdbrefdata
+  Sitecore_Reporting_Service_Url: http://rep
+  Sitecore_Processing_Service_Url: http://prc
+  Sitecore_Reporting_Service_Require_Https: "false"
+  Sitecore_Processing_Service_Require_Https: "false"
+  Sitecore_AppSettings_Telerik.AsyncUpload.ConfigurationEncryptionKey: r8xlexi45i6ieasno3wpyk55fyuc1n1j
+  Sitecore_AppSettings_Telerik.Upload.ConfigurationHashKey: r8xlexi45i6ieasno3wpyk55fyuc1n1j
+  Sitecore_AppSettings_Telerik.Web.UI.DialogParametersEncryptionKey: r8xlexi45i6ieasno3wpyk55fyuc1n1j
+  Sitecore_License: ${SITECORE_LICENSE}
+  Sitecore_Identity_Server_Authority: https://sitecore-id
+  Sitecore_Identity_Server_InternalAuthority: http://sitecore-id
+  Sitecore_Identity_Server_CallbackAuthority: https://sitecore-cm
+  Sitecore_Identity_Server_Require_Https: "false"

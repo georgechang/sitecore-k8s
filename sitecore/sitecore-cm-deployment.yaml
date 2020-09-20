@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sitecore-cm-deployment
+  labels:
+    app: sitecore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sitecore
+  template:
+    metadata:
+      labels:
+        app: sitecore
+        role: cm
+    spec:
+      containers:
+        - name: sitecore-cm
+          image: scr.sitecore.com/sxp/sitecore-xp1-cm:10.0.0-ltsc2019
+          ports:
+            - name: web
+              containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: sitecore-cm-configmap
+          resources:
+            limits:
+              memory: 8Gi
+              cpu: 2
+      nodeSelector:
+        kubernetes.io/os: windows

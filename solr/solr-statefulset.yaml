@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: solr-statefulset
+  labels:
+    app: solr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solr
+  serviceName: solr-service
+  template:
+    metadata:
+      labels:
+        app: solr
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+        - name: solr
+          image: solr:8
+          env:
+            - name: ZK_HOST
+              value: zookeeper:2181
+            - name: SOLR_JAVA_MEM
+              value: "-Xms2g -Xmx2g"
+          ports:
+            - name: solr
+              containerPort: 8983
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: 500m
+          volumeMounts:
+            - name: solr-pv
+              mountPath: /var/solr
+      nodeSelector:
+        kubernetes.io/os: linux
+  volumeClaimTemplates:
+    - metadata:
+        name: solr-pv
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: azurefile-retained
+        resources:
+          requests:
+            storage: 1Gi

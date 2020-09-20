@@ -1,0 +1,75 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"resources": [
+		{
+			"type": "Microsoft.Network/virtualNetworks",
+			"apiVersion": "2020-05-01",
+			"name": "test-vnet",
+			"location": "East US",
+			"properties": {
+				"addressSpace": {
+					"addressPrefixes": []
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Network/virtualNetworks/subnets",
+			"apiVersion": "2020-05-01",
+			"name": "test-vnet-subnet",
+			"dependsOn": ["test-vnet"],
+			"properties": {
+				"addressPrefix": ""
+			}
+		},
+		{
+			"type": "Microsoft.ContainerService/managedClusters",
+			"apiVersion": "2020-06-01",
+			"name": "test-aks",
+			"location": "East US",
+			"properties": {
+				"kubernetesVersion": "",
+				"dnsPrefix": "test-aks",
+				"agentPoolProfiles": [
+					{
+						"name": "sclinux",
+						"count": 1,
+						"vmSize": "Standard_B2ms",
+						"osType": "Linux"
+					},
+					{
+						"name": "sclinux",
+						"count": 2,
+						"vmSize": "Standard_B4ms",
+						"osType": "Windows"
+					}
+				],
+				"linuxProfile": {
+					"adminUserName": "admin",
+					"ssh": {
+						"publicKeys": [
+							{
+								"keyData": "" // ssh auth cert public key - pem
+							}
+						]
+					}
+				},
+				"windowsProfile": {
+					"adminUsername": "admin",
+					"adminPassword": "Pass@word123!"
+				},
+				"networkProfile": {
+					"networkPlugin": "kubenet"
+				},
+				"servicePrincipalProfile": {
+					"clientId": "",
+					"secret": ""
+				}
+			},
+			"sku": {
+				"name": "Basic",
+				"tier": "Free"
+			}
+		}
+	]
+}

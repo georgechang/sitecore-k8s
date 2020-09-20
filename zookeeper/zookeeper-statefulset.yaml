@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper-statefulset
+  labels:
+    app: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper-service
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.6
+          env:
+            - name: ZOO_4LW_COMMANDS_WHITELIST
+              value: "mntr,conf,ruok"
+          ports:
+            - name: zookeeper
+              containerPort: 2181
+          resources:
+            limits:
+              memory: 500Mi
+              cpu: 500m
+          volumeMounts:
+            - name: zookeeper-data-pv
+              mountPath: /data
+            - name: zookeeper-conf-pv
+              mountPath: /conf
+      nodeSelector:
+        kubernetes.io/os: linux
+  volumeClaimTemplates:
+    - metadata:
+        name: zookeeper-data-pv
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: azurefile-retained
+        resources:
+          requests:
+            storage: 100Mi
+    - metadata:
+        name: zookeeper-conf-pv
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: azurefile-retained
+        resources:
+          requests:
+            storage: 1Mi

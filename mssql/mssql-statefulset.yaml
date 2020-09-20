@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql-statefulset
+  labels:
+    app: mssql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql
+  serviceName: mssql-service
+  template:
+    metadata:
+      labels:
+        app: mssql
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+        - name: mssql
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              value: "pass@word1"
+          ports:
+            - name: mssql
+              containerPort: 1433
+          volumeMounts:
+            - name: mssql-pv
+              mountPath: /var/opt/mssql
+      nodeSelector:
+        kubernetes.io/os: linux
+  volumeClaimTemplates:
+    - metadata:
+        name: mssql-pv
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: azurefile-retained
+        resources:
+          requests:
+            storage: 10Gi
