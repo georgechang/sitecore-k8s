@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cortexproc-deployment
+  namespace: sitecore
+  labels:
+    app: sitecore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sitecore
+  template:
+    metadata:
+      labels:
+        app: sitecore
+        role: cortexproc
+    spec:
+      containers:
+        - name: cortexproc
+          image: scr.sitecore.com/sxp/sitecore-xp0-cortexprocessingworker:10.0.0-ltsc2019
+          envFrom:
+            - configMapRef:
+                name: sitecore-configmap
+          resources:
+            limits:
+              memory: 500Mi
+              cpu: 300m
+      nodeSelector:
+        kubernetes.io/os: windows
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cortexproc-service
+  namespace: sitecore
+  labels:
+    app: sitecore
+    role: cortexproc
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 80
+  selector:
+    app: sitecore
+    role: cortexproc

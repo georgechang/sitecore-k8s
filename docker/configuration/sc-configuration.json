@@ -1,0 +1,8 @@
+{
+  "configset": "sitecore",
+  "indexes": [
+    "sitecore_core_index",
+    "sitecore_master_index",
+    "sitecore_web_index"
+  ]
+}

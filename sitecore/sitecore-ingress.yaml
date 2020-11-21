@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sitecore-ingress
+  namespace: sitecore
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - host: cm.sitecore-k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sitecore-cm-service
+                port:
+                  number: 80
+
+    - host: cd.sitecore-k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sitecore-cd-service
+                port:
+                  number: 80
+
+    - host: id.sitecore-k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sitecore-id-service
+                port:
+                  number: 80

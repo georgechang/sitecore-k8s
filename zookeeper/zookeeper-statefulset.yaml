@@ -1,11 +1,26 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zookeeper-pdb
+  namespace: solr
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  maxUnavailable: 1
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper-statefulset
+  namespace: solr
   labels:
     app: zookeeper
 spec:
   replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app: zookeeper
@@ -15,42 +30,80 @@ spec:
       labels:
         app: zookeeper
     spec:
-      containers:
-        - name: zookeeper
-          image: zookeeper:3.6
-          env:
-            - name: ZOO_4LW_COMMANDS_WHITELIST
-              value: "mntr,conf,ruok"
-          ports:
-            - name: zookeeper
-              containerPort: 2181
-          resources:
-            limits:
-              memory: 500Mi
-              cpu: 500m
-          volumeMounts:
-            - name: zookeeper-data-pv
-              mountPath: /data
-            - name: zookeeper-conf-pv
-              mountPath: /conf
       nodeSelector:
         kubernetes.io/os: linux
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - zookeeper
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.5
+          env:
+            - name: ZK_REPLICAS
+              value: "1"
+            - name: ZK_TICK_TIME
+              value: "2000"
+            - name: ZOO_4LW_COMMANDS_WHITELIST
+              value: "mntr,conf,ruok"
+            - name: ZOO_STANDALONE_ENABLED
+              value: "false"
+            - name: ZOO_SERVERS
+              value: server.1=zookeeper-statefulset-0.zookeeper-service:2888:3888;2181 #server.2=zookeeper-statefulset-1.zookeeper-service:2888:3888;2181 server.3=zookeeper-statefulset-2.zookeeper-service:2888:3888;2181
+            - name: ZOO_CFG_EXTRA
+              value: "quorumListenOnAllIPs=true electionPortBindRetry=0"
+          ports:
+            - name: client
+              containerPort: 2181
+              protocol: TCP
+            - name: server
+              containerPort: 2888
+              protocol: TCP
+            - name: election
+              containerPort: 3888
+              protocol: TCP
+          volumeMounts:
+            - name: zookeeper-pv
+              mountPath: /data
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - 'OK=$(echo ruok | nc 127.0.0.1 2181); if [ "$OK" = "imok" ]; then	exit 0; else exit 1; fi;'
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - 'OK=$(echo ruok | nc 127.0.0.1 2181); if [ "$OK" = "imok" ]; then	exit 0; else exit 1; fi;'
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+      initContainers:
+        - name: zookeeper-id
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - echo $((${HOSTNAME##*-}+1)) > /data-new/myid
+          volumeMounts:
+            - name: zookeeper-pv
+              mountPath: /data-new
   volumeClaimTemplates:
     - metadata:
-        name: zookeeper-data-pv
+        name: zookeeper-pv
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: azurefile-retained
+        storageClassName: managed-premium-retained
         resources:
           requests:
             storage: 100Mi
-    - metadata:
-        name: zookeeper-conf-pv
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: azurefile-retained
-        resources:
-          requests:
-            storage: 1Mi

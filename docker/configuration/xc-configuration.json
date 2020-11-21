@@ -1,0 +1,14 @@
+{
+  "configset": "sitecore",
+  "indexes": [
+    "sitecore_fxm_master_index",
+    "sitecore_fxm_web_index",
+    "sitecore_marketing_asset_index_master",
+    "sitecore_marketing_asset_index_web",
+    "sitecore_marketingdefinitions_master",
+    "sitecore_marketingdefinitions_web",
+    "sitecore_personalization_index",
+    "sitecore_suggested_test_index",
+    "sitecore_testing_index"
+  ]
+}

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: solr-statefulset
+  namespace: solr
   labels:
     app: solr
 spec:
@@ -18,33 +19,64 @@ spec:
       securityContext:
         runAsUser: 1001
         fsGroup: 1001
+      nodeSelector:
+        kubernetes.io/os: linux
       containers:
         - name: solr
-          image: solr:8
+          image: solr:8.5.2
           env:
             - name: ZK_HOST
-              value: zookeeper:2181
+              value: zookeeper-statefulset-0.zookeeper-service:2181 #,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181
             - name: SOLR_JAVA_MEM
-              value: "-Xms2g -Xmx2g"
+              value: "-Xms4g -Xmx4g"
           ports:
             - name: solr
               containerPort: 8983
-          resources:
-            limits:
-              memory: 4Gi
-              cpu: 500m
           volumeMounts:
             - name: solr-pv
               mountPath: /var/solr
-      nodeSelector:
-        kubernetes.io/os: linux
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - "/opt/docker-solr/scripts/wait-for-solr.sh"
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - "/opt/docker-solr/scripts/wait-for-solr.sh"
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+      initContainers:
+        - name: solr-zk-waiter
+          image: solr:8.5.2
+          command:
+            - /bin/bash
+            - "-c"
+            - "/opt/docker-solr/scripts/wait-for-zookeeper.sh"
+          env:
+            - name: ZK_HOST
+              value: zookeeper-statefulset-0.zookeeper-service:2181 #,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181
+        - name: solr-init
+          image: solr:8.5.2
+          command:
+            - /bin/bash
+            - "-c"
+            - "/opt/docker-solr/scripts/init-var-solr"
+          volumeMounts:
+            - name: solr-pv
+              mountPath: /var/solr
   volumeClaimTemplates:
     - metadata:
         name: solr-pv
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: azurefile-retained
+        storageClassName: managed-premium-retained
         resources:
           requests:
-            storage: 1Gi
+            storage: 100Mi

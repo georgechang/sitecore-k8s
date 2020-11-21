@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mssql-statefulset
+  namespace: mssql
   labels:
     app: mssql
 spec:
@@ -16,8 +17,8 @@ spec:
         app: mssql
     spec:
       securityContext:
-        runAsUser: 1001
-        fsGroup: 1001
+        runAsUser: 10001
+        fsGroup: 10001
       containers:
         - name: mssql
           image: mcr.microsoft.com/mssql/server:2019-latest
@@ -40,7 +41,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: azurefile-retained
+        storageClassName: managed-premium-retained
         resources:
           requests:
             storage: 10Gi

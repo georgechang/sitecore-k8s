@@ -1,0 +1,7 @@
+{
+  "configset": "_default",
+  "indexes": [
+    "sitecore_xdb",
+    "sitecore_xdb_rebuild"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "defaultValue": "sitecore-k8s"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[format('{0}-sql', parameters('prefix'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "administratorLogin": "sitecore",
+        "administratorLoginPassword": "pass@word1"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/elasticPools",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[format('{0}/{1}-pool', format('{0}-sql', parameters('prefix')), parameters('prefix'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "GP_Gen5",
+        "tier": "GeneralPurpose",
+        "family": "Gen5",
+        "capacity": 2
+      },
+      "properties": {
+        "licenseType": "LicenseIncluded"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', format('{0}-sql', parameters('prefix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[format('{0}/{1}-core', format('{0}-sql', parameters('prefix')), parameters('prefix'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "elasticPoolId": "[resourceId('Microsoft.Sql/servers/elasticPools', split(format('{0}/{1}-pool', format('{0}-sql', parameters('prefix')), parameters('prefix')), '/')[0], split(format('{0}/{1}-pool', format('{0}-sql', parameters('prefix')), parameters('prefix')), '/')[1])]",
+        "licenseType": "LicenseIncluded"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/elasticPools', split(format('{0}/{1}-pool', format('{0}-sql', parameters('prefix')), parameters('prefix')), '/')[0], split(format('{0}/{1}-pool', format('{0}-sql', parameters('prefix')), parameters('prefix')), '/')[1])]",
+        "[resourceId('Microsoft.Sql/servers', format('{0}-sql', parameters('prefix')))]"
+      ]
+    }
+  ]
+}

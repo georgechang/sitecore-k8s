@@ -1,15 +1,8 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: azurefile-retained
-provisioner: kubernetes.io/azure-file
-mountOptions:
-  - dir_mode=0777
-  - file_mode=0777
-  - uid=0
-  - gid=0
-  - mfsymlinks
-  - cache=strict
+  name: managed-premium-retained
+provisioner: kubernetes.io/azure-disk
 reclaimPolicy: Retain
 parameters:
-  skuName: Standard_LRS
+  skuName: Premium_LRS
