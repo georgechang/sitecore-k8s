@@ -33,7 +33,7 @@ spec:
             - name: solr
               containerPort: 8983
           volumeMounts:
-            - name: solr-pv
+            - name: solr-pvc
               mountPath: /var/solr
           livenessProbe:
             exec:
@@ -72,7 +72,7 @@ spec:
               mountPath: /var/solr
   volumeClaimTemplates:
     - metadata:
-        name: solr-pv
+        name: solr-pvc
       spec:
         accessModes:
           - ReadWriteOnce

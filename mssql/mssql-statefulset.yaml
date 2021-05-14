@@ -31,13 +31,13 @@ spec:
             - name: mssql
               containerPort: 1433
           volumeMounts:
-            - name: mssql-pv
+            - name: mssql-pvc
               mountPath: /var/opt/mssql
       nodeSelector:
         kubernetes.io/os: linux
   volumeClaimTemplates:
     - metadata:
-        name: mssql-pv
+        name: mssql-pvc
       spec:
         accessModes:
           - ReadWriteOnce

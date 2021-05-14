@@ -5,7 +5,11 @@ metadata:
   namespace: mssql
   labels:
     app: mssql
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "mssql-subnet"
 spec:
+  type: LoadBalancer
   ports:
     - port: 1433
   selector:

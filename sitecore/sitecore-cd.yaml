@@ -5,6 +5,7 @@ metadata:
   namespace: sitecore
   labels:
     app: sitecore
+    role: cd
 spec:
   replicas: 1
   selector:
@@ -27,7 +28,7 @@ spec:
                 name: sitecore-configmap
           resources:
             limits:
-              memory: 8Gi
+              memory: 4Gi
               cpu: 1
       nodeSelector:
         kubernetes.io/os: windows

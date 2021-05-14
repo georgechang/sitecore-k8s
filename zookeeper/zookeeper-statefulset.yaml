@@ -44,7 +44,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: zookeeper
-          image: zookeeper:3.5
+          image: zookeeper:3.6.1
           env:
             - name: ZK_REPLICAS
               value: "1"

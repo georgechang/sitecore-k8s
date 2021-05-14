@@ -5,7 +5,10 @@ metadata:
   namespace: solr
   labels:
     app: zookeeper
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 spec:
+  type: LoadBalancer
   ports:
     - port: 2888
       name: server
