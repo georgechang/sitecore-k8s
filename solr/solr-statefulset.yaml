@@ -6,7 +6,7 @@ metadata:
   labels:
     app: solr
 spec:
-  replicas: 1
+  replicas: 3 # set this to the number of Solr pod instances you want
   selector:
     matchLabels:
       app: solr
@@ -21,14 +21,27 @@ spec:
         fsGroup: 1001
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: solr
+      affinity:
+        # this causes K8s to only schedule only one Solr pod per node
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - solr
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: solr
-          image: solr:8.5.2
+          image: solr:8.4
           env:
+            # ZK_HOST lists all of the hostnames for all of the Zookeeper instances - this should correspond to however many ZK instances you have running.
             - name: ZK_HOST
-              value: zookeeper-statefulset-0.zookeeper-service:2181 #,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181
+              value: zookeeper-statefulset-0.zookeeper-service:2181,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181, etc
             - name: SOLR_JAVA_MEM
-              value: "-Xms4g -Xmx4g"
+              value: "-Xms4g -Xmx4g" # set the JVM memory usage and limit
           ports:
             - name: solr
               containerPort: 8983
@@ -36,6 +49,7 @@ spec:
             - name: solr-pvc
               mountPath: /var/solr
           livenessProbe:
+            # runs a built-in script to check for Solr readiness/liveness
             exec:
               command:
                 - /bin/bash
@@ -44,6 +58,7 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
           readinessProbe:
+            # runs a built-in script to check for Solr readiness/liveness
             exec:
               command:
                 - /bin/bash
@@ -52,17 +67,19 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
       initContainers:
+        # runs a built-script to wait until all Zookeeper instances are up and running
         - name: solr-zk-waiter
-          image: solr:8.5.2
+          image: solr:8.4
           command:
             - /bin/bash
             - "-c"
             - "/opt/docker-solr/scripts/wait-for-zookeeper.sh"
           env:
             - name: ZK_HOST
-              value: zookeeper-statefulset-0.zookeeper-service:2181 #,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181
+              value: zookeeper-statefulset-0.zookeeper-service:2181,zookeeper-statefulset-1.zookeeper-service:2181,zookeeper-statefulset-2.zookeeper-service:2181
+        # runs a built-in script to initialize Solr instance if necessary
         - name: solr-init
-          image: solr:8.5.2
+          image: solr:8.4
           command:
             - /bin/bash
             - "-c"
@@ -76,7 +93,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: managed-premium-retained
+        storageClassName: managed-premium
         resources:
           requests:
-            storage: 100Mi
+            storage: 1Gi

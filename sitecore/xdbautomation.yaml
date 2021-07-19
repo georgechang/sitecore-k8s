@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: xdbautomation
-          image: scr.sitecore.com/sxp/sitecore-xp0-xdbautomationworker:10.0.0-ltsc2019
+          image: scr.sitecore.com/sxp/sitecore-xp0-xdbautomationworker:10.1-ltsc2019
           envFrom:
             - configMapRef:
                 name: sitecore-configmap

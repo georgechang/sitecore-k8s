@@ -1,3 +1,4 @@
+# this allows for max 1 instance of ZK to be unavailable - should be updated based on the number of instances being deployed to maintain a quorum
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
@@ -17,7 +18,7 @@ metadata:
   labels:
     app: zookeeper
 spec:
-  replicas: 1
+  replicas: 3
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: Parallel
@@ -32,7 +33,9 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/os: linux
+        agentpool: solr
       affinity:
+        # this causes K8s to only schedule only one Zookeeper pod per node
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
@@ -44,20 +47,21 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: zookeeper
-          image: zookeeper:3.6.1
+          image: zookeeper:3.4
           env:
             - name: ZK_REPLICAS
-              value: "1"
+              value: "3" # informs Zookeeper of the number of intended replicas
             - name: ZK_TICK_TIME
               value: "2000"
             - name: ZOO_4LW_COMMANDS_WHITELIST
               value: "mntr,conf,ruok"
             - name: ZOO_STANDALONE_ENABLED
               value: "false"
+            # lists all of the Zookeeper servers that are part of this cluster
             - name: ZOO_SERVERS
-              value: server.1=zookeeper-statefulset-0.zookeeper-service:2888:3888;2181 #server.2=zookeeper-statefulset-1.zookeeper-service:2888:3888;2181 server.3=zookeeper-statefulset-2.zookeeper-service:2888:3888;2181
+              value: server.1=zookeeper-statefulset-0.zookeeper-service:2888:3888;2181 server.2=zookeeper-statefulset-1.zookeeper-service:2888:3888;2181 server.3=zookeeper-statefulset-2.zookeeper-service:2888:3888;2181
             - name: ZOO_CFG_EXTRA
-              value: "quorumListenOnAllIPs=true electionPortBindRetry=0"
+              value: "quorumListenOnAllIPs=true electionPortBindRetry=0" # quorumListenOnAllIPs allows ZK to listen on all IP addresses for leader election/follower, electionPortBindRetry disables the max retry count as other ZK instances are spinning up
           ports:
             - name: client
               containerPort: 2181
@@ -72,6 +76,7 @@ spec:
             - name: zookeeper-pv
               mountPath: /data
           livenessProbe:
+            # runs a shell script to ping the running local Zookeeper instance, which responds with "imok" once the instance is ready
             exec:
               command:
                 - sh
@@ -80,6 +85,7 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
           readinessProbe:
+            # runs a shell script to ping the running local Zookeeper instance, which responds with "imok" once the instance is ready
             exec:
               command:
                 - sh
@@ -88,6 +94,7 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
       initContainers:
+        # each ZK instance requires an ID specification - since we can't set the ID using env variables, this init container sets the ID for each instance incrementally through a file on a volume mount
         - name: zookeeper-id
           image: busybox:latest
           command:
@@ -103,7 +110,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: managed-premium-retained
+        storageClassName: managed-premium
         resources:
           requests:
-            storage: 100Mi
+            storage: 1Gi

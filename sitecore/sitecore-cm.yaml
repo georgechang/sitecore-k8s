@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: sitecore-cm
-          image: scr.sitecore.com/sxp/sitecore-xp0-cm:10.0.0-ltsc2019
+          image: scr.sitecore.com/sxp/sitecore-xp0-cm:10.1-ltsc2019
           ports:
             - name: web
               containerPort: 80
@@ -29,7 +29,7 @@ spec:
           resources:
             limits:
               memory: 4Gi
-              cpu: 1
+              cpu: 1000m
       nodeSelector:
         kubernetes.io/os: windows
 ---
@@ -37,19 +37,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sitecore-cm-service
-<<<<<<< HEAD:sitecore/sitecore-cm.yaml
-  namespace: sitecore
-=======
->>>>>>> 3f53c9c (Updates):sitecore/sitecore-cm-deployment.yaml
   labels:
     app: sitecore
     role: cm
 spec:
-<<<<<<< HEAD:sitecore/sitecore-cm.yaml
-  type: ClusterIP
-  clusterIP: None
-=======
->>>>>>> 3f53c9c (Updates):sitecore/sitecore-cm-deployment.yaml
   ports:
     - port: 80
   selector:

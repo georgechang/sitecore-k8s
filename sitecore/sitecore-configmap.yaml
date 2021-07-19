@@ -4,16 +4,16 @@ metadata:
   name: sitecore-configmap
 data:
   Sitecore_AppSettings_instanceNameMode__define: default
-  Sitecore_ConnectionStrings_Core: Data Source=mssql-service;Initial Catalog=Sitecore.Core;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Security: Data Source=mssql-service;Initial Catalog=Sitecore.Core;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Master: Data Source=mssql-service;Initial Catalog=Sitecore.Master;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Web: Data Source=mssql-service;Initial Catalog=Sitecore.Web;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Core: Data Source=mssql-service;Initial Catalog=Sitecore.Core;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Security: Data Source=mssql-service;Initial Catalog=Sitecore.Core;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Master: Data Source=mssql-service;Initial Catalog=Sitecore.Master;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Web: Data Source=mssql-service;Initial Catalog=Sitecore.Web;User ID=sa;Password=password
   Sitecore_ConnectionStrings_Reporting.ApiKey: vqr4pnanyuuz8q85rbzvxih9yd3bytew
-  Sitecore_ConnectionStrings_Messaging: Data Source=mssql-service;Initial Catalog=Sitecore.Messaging;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Xdb.Referencedata: Data Source=mssql-service;Initial Catalog=Sitecore.Referencedata;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_ExperienceForms: Data Source=mssql-service;Initial Catalog=Sitecore.ExperienceForms;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Exm.Master: Data Source=mssql-service;Initial Catalog=Sitecore.Exm.master;User ID=sa;Password=pass@word1
-  Sitecore_ConnectionStrings_Reporting: Data Source=mssql-service;Initial Catalog=Sitecore.Reporting;User ID=sa;Password=pass@word1
+  Sitecore_ConnectionStrings_Messaging: Data Source=mssql-service;Initial Catalog=Sitecore.Messaging;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Xdb.Referencedata: Data Source=mssql-service;Initial Catalog=Sitecore.Referencedata;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_ExperienceForms: Data Source=mssql-service;Initial Catalog=Sitecore.ExperienceForms;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Exm.Master: Data Source=mssql-service;Initial Catalog=Sitecore.Exm.master;User ID=sa;Password=password
+  Sitecore_ConnectionStrings_Reporting: Data Source=mssql-service;Initial Catalog=Sitecore.Reporting;User ID=sa;Password=password
   Sitecore_ConnectionStrings_Sitecore.Reporting.Client: http://cortexreporting
   Sitecore_ConnectionStrings_Solr.Search: http://solr-service:8983/solr
   Sitecore_ConnectionStrings_XConnect.Collection: http://xdbcollection
